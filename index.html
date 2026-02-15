@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MT Fashion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+
+    .buttons a {
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 25px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    footer {
+      padding: 20px;
+      font-size: 14px;
+      color: #64748b;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body class="font-[Poppins] bg-gradient-to-r from-blue-50 via-white to-green-50 min-h-screen">
+
+  <!-- En-tête complet -->
+<nav class="bg-gradient-to-r from-blue-600 to-green-500 text-white p-4 shadow-md sticky top-0 z-40">
+  <div class="container mx-auto flex justify-between items-center">
+    <!-- Logo -->
+    <h1 class="text-2xl font-bold tracking-wide">✨ MT Fashion</h1>
+
+    <!-- Icône panier -->
+    <button onclick="openCart()" class="relative text-2xl ml-4">
+      🛒
+      <span id="cartCount" 
+            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
+        0
+      </span>
+    </button>
+  </div>
+
+  <!-- Catégories intégrées -->
+  <div class="flex justify-center gap-4 mt-3">
+    <button onclick="filterCategory('all')" 
+            class="px-5 py-1 rounded-full bg-white text-gray-800 shadow hover:scale-105 transition text-sm">
+      🌍 Tous
+    </button>
+    <button onclick="filterCategory('Coiffes')" 
+            class="px-5 py-1 rounded-full bg-white text-blue-600 shadow hover:scale-105 transition text-sm">
+      🎀 Coiffes
+    </button>
+    <button onclick="filterCategory('Pagnes')" 
+            class="px-5 py-1 rounded-full bg-white text-green-600 shadow hover:scale-105 transition text-sm">
+      🧵 Pagnes
+    </button>
+  </div>
+</nav>
+
+
+  <!-- Produits phares -->
+  <section class="container mx-auto px-6 py-12">
+    <h3 class="text-3xl font-semibold text-center mb-8 text-gray-800">🌟 Nos Produits Phares</h3>
+    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+  </section>
+
+  <!-- Fond grisé -->
+  <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="closeCart()"></div>
+
+  <!-- Panier slide-in -->
+  <div id="cartPanel" 
+       class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-500 z-50">
+    <div class="p-6">
+      <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+        🛒 Mon Panier
+      </h3>
+      <ul id="cartItems" class="divide-y divide-gray-200 mb-4"></ul>
+      <button onclick="checkout()" 
+              class="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white py-2 rounded-lg shadow hover:scale-105 transition">
+        Commander via WhatsApp
+      </button>
+      <button onclick="closeCart()" 
+              class="mt-4 w-full bg-red-500 text-white py-2 rounded-lg shadow hover:bg-red-600">
+        Fermer
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="fixed bottom-5 right-5 hidden bg-black text-white px-4 py-2 rounded-lg shadow-lg"></div>
+
+  <!-- Modal produit -->
+  <div id="productModal" 
+       class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 
+              transition-opacity duration-300 opacity-0"
+       onclick="closeModal(event)">
+    <div class="bg-white rounded-xl shadow-xl w-96 relative transform transition-transform duration-300 scale-95"
+         onclick="event.stopPropagation()">
+      
+      <!-- Bouton croix -->
+      <button onclick="closeModal()" 
+              class="absolute top-2 right-2 
+                     w-10 h-10 flex items-center justify-center
+                     rounded-full border border-gray-400 
+                     text-gray-700 hover:text-black hover:border-black 
+                     bg-white shadow-lg z-50">
+        ✖
+      </button>
+      
+      <!-- Carrousel -->
+      <div id="carousel" class="relative">
+        <img id="carouselImage" src="" alt="Produit" class="w-full h-64 object-cover rounded-t-xl">
+        <div class="flex justify-between absolute top-1/2 w-full px-2">
+          <button onclick="prevImage()" class="bg-gray-700 text-white px-2 py-1 rounded-full shadow">◀</button>
+          <button onclick="nextImage()" class="bg-gray-700 text-white px-2 py-1 rounded-full shadow">▶</button>
+        </div>
+      </div>
+
+      <!-- Infos produit -->
+      <div class="p-6">
+        <h3 id="modalName" class="text-lg font-bold text-gray-800"></h3>
+        <p id="modalPrice" class="text-gray-600"></p>
+        <input type="number" id="modalQty" value="1" min="1" class="border rounded w-16 text-center mt-2">
+        <button onclick="addModalToCart()" class="mt-4 w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-2 rounded-lg shadow hover:scale-105 transition">
+          Ajouter au panier
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const products = [
+      {name: "Coiffes", price: "5,000", images: ["images/Coiffes.jpg"], category: "Coiffes", disponible: true},
+      {name: "Pagnes", price: "20,000", images: ["images/Pagnes.jpg"], category: "Pagnes", disponible: true},
+      {name: "fleur bande", price: "3,000", images: ["images/coiffe fleur1.jpg","images/coiffe fleur2.jpg"], category: "Coiffes", disponible: true},
+      {name: "fleur bande perlé", price: "5,000", images: ["images/coiffe bande1.jpg","images/coiffe bande2.jpg","images/coiffe bande3.jpg"], category: "Coiffes", disponible: true},
+      {name: "Coiffes borné", price: "3,500", images: ["images/borné1.jpg","images/borné2.jpg"], category: "Coiffes", disponible: true},
+      {name: "Model par préférence", price: "par commande, avec votre pagne", images: ["images/model1.jpg","images/model2.jpg","images/model3.jpg","images/model4.jpg","images/model5.jpg","images/model6.jpg","images/model7.jpg"], category: "Coiffes", disponible: true},
+      {name: "Coiffes fermé", price: "4,000", images: ["images/coiffe21.jpg","images/coiffe22.jpg","images/coiffe23.jpg"], category: "Coiffes", disponible: true},
+      {name: "Pagnes", price: "20,000", images: ["images/pagne1.jpg"], category: "Pagnes", disponible: true},
+      {name: "Stylé sur côté", price: "3,000", images: ["images/stylé1.jpg"], category: "Coiffes", disponible: true},
+      {name: "Pagnes", price: "20,000", images: ["images/pagne2.jpg"], category: "Pagnes", disponible: true},
+      {name: "Petit châpeau Akan", price: "1,500", images: ["images/borné21.jpg","images/borné22.jpg","images/borné23.jpg","images/borné24.jpg"], category: "Coiffes", disponible: true},
+      {name: "Pagnes", price: "20,000", images: ["images/pagne3.jpg"], category: "Pagnes", disponible: true},
+      {name: "Pagnes", price: "20,000", images: ["images/pagne4.jpg"], category: "Pagnes", disponible: true},
+      {name: "Coiffes", price: "5,000", images: ["images/coiffe perlé1.jpg","images/coiffe perlé2.jpg"], category: "Coiffes", disponible: true},
+    ];
+
+    let cart = [];
+    let currentProduct = null;
+    let currentImageIndex = 0;
+
+    function displayProducts(filter = "all") {
+      const grid = document.getElementById("productGrid");
+      grid.innerHTML = "";
+      products.filter(p => filter === "all" || p.category === filter).forEach((p, i) => {
+        grid.innerHTML += `
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition hover:scale-105"
+               onclick="openModal(${i})">
+            <img src="${p.images[0]}" alt="${p.name}" class="w-full h-48 object-cover">
+            <div class="p-4">
+              <h3 class="text-lg font-bold text-gray-800">${p.name}</h3>
+              <p class="text-gray-600">Prix: ${p.price} CFA</p>
+              <span class="inline-block ${p.disponible ? 'bg-green-500' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded">
+                ${p.disponible ? 'Disponible' : 'Indisponible'}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+    }
+    displayProducts();
+
+    function filterCategory(cat) {
+      displayProducts(cat);
+    }
+
+    function openModal(index) {
+      currentProduct = products[index];
+      currentImageIndex = 0;
+      document.getElementById("carouselImage").src = currentProduct.images[currentImageIndex];
+      document.getElementById("modalName").textContent = currentProduct.name;
+      document.getElementById("modalPrice").textContent = "Prix: " + currentProduct.price + " CFA";
+
+      const modal = document.getElementById("productModal");
+      modal.classList.remove("hidden");
+      setTimeout(() => {
+        modal.classList.remove("opacity-0");
+        modal.querySelector("div").classList.remove("scale-95");
+      }, 10);
+    }
+
+    function closeModal(event = null) {
+      const modal = document.getElementById("productModal");
+      if (!event || event.target.id === "productModal") {
+        modal.classList.add("opacity-0");
+        modal.querySelector("div").classList.add("scale-95");
+        setTimeout(() => modal.classList.add("hidden"), 300);
+      }
+    }
+
+    function nextImage() {
+      currentImageIndex = (currentImageIndex + 1) % currentProduct.images.length;
+      document.getElementById("carouselImage").src = currentProduct.images[currentImageIndex];
+    }
+
+    function prevImage() {
+      currentImageIndex = (currentImageIndex - 1 + currentProduct.images.length) % currentProduct.images.length;
+      document.getElementById("carouselImage").src = currentProduct.images[currentImageIndex];
+    }
+
+
+
+  function openCart() {
+      document.getElementById("cartPanel").classList.remove("translate-x-full");
+      document.getElementById("cartPanel").classList.add("translate-x-0");
+      document.getElementById("cartOverlay").classList.remove("hidden");
+    }
+
+    function closeCart() {
+      document.getElementById("cartPanel").classList.remove("translate-x-0");
+      document.getElementById("cartPanel").classList.add("translate-x-full");
+      document.getElementById("cartOverlay").classList.add("hidden");
+    }
+
+    // Compteur panier
+    function updateCartCount() {
+      const badge = document.getElementById("cartCount");
+      badge.textContent = cart.length;
+      // Animation rebond
+      badge.classList.add("animate-bounce");
+      setTimeout(() => badge.classList.remove("animate-bounce"), 500);
+    }
+
+    // Ajouter depuis modal
+    function addModalToCart() {
+      let qty = parseInt(document.getElementById("modalQty").value);
+      cart.push({name: currentProduct.name, price: currentProduct.price, qty});
+      closeModal();
+      displayCart();
+      updateCartCount();
+      showToast(`${currentProduct.name} ajouté au panier ✅`);
+      openCart();
+    }
+
+    // Affichage panier
+    function displayCart() {
+      const cartList = document.getElementById("cartItems");
+      cartList.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        total += item.price * item.qty;
+        cartList.innerHTML += `
+          <li class="flex justify-between items-center py-3 px-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <span class="text-gray-700">
+              ${item.name} x${item.qty} - 
+              <span class="text-blue-600 font-semibold">${item.price * item.qty} CFA</span>
+            </span>
+            <button onclick="removeFromCart(${index})" 
+                    class="bg-gradient-to-r from-red-500 to-red-700 text-white px-3 py-1 rounded-lg shadow hover:scale-105 transition">
+              Retirer
+            </button>
+          </li>
+        `;
+      });
+
+      cartList.innerHTML += `
+        <li class="flex justify-between items-center py-3 px-2 font-bold text-lg">
+          <span>Total</span>
+          <span class="text-green-600">${total} CFA</span>
+        </li>
+      `;
+    }
+
+    // Retirer du panier
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      displayCart();
+      updateCartCount();
+      showToast("Article retiré du panier ❌");
+    }
+
+    // Checkout WhatsApp
+    function checkout() {
+      if(cart.length === 0) {
+        alert("Votre panier est vide !");
+        return;
+      }
+      let message = "Bonjour, je voudrais commander:\n";
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.qty;
+        message += `- ${item.name} x${item.qty} (${item.price * item.qty} CFA)\n`;
+      });
+      message += `Total: ${total} CFA`;
+
+      let phoneNumber = "2250504428338"; // Ton numéro WhatsApp Business
+      let url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    }
+
+    // Toast notification
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 2000);
+    }
+
+    // Initialiser compteur
+    updateCartCount();
+
+  </script>
+
+  <footer>
+    © 2026 — Marque T. Tous droits réservés.
+        by enock_tmz
+  </footer>
+</body>
+</html>
+
