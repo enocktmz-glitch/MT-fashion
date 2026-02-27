@@ -2,168 +2,141 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>MT Fashion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MT Fashion - Boutique en ligne</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-
-    .buttons a {
-      text-decoration: none;
-      padding: 12px 28px;
-      border-radius: 25px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    footer {
-      padding: 20px;
-      font-size: 14px;
-      color: #64748b;
-      text-align: center;
-    }
-
+    .transition-all { transition: all 0.3s ease; }
+    .cart-panel { transition: transform 0.4s ease-in-out; }
   </style>
 </head>
 <body class="font-[Poppins] bg-gradient-to-r from-blue-50 via-white to-green-50 min-h-screen">
 
-  <!-- En-tête complet -->
-<nav class="bg-gradient-to-r from-blue-600 to-green-500 text-white p-4 shadow-md sticky top-0 z-40">
-  <div class="container mx-auto flex justify-between items-center">
-    <!-- Logo -->
-    <h1 class="text-2xl font-bold tracking-wide">✨ MT Fashion</h1>
+  <!-- ==================== EN-TÊTE ==================== -->
+  <nav class="bg-gradient-to-r from-blue-600 to-green-500 text-white p-4 shadow-md sticky top-0 z-40">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold tracking-wide">✨ MT Fashion</h1>
+      <button onclick="openCart()" class="relative text-2xl ml-4">
+        🛒
+        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full animate-pulse">0</span>
+      </button>
+    </div>
 
-    <!-- Icône panier -->
-    <button onclick="openCart()" class="relative text-2xl ml-4">
-      🛒
-      <span id="cartCount" 
-            class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
-        0
-      </span>
-    </button>
-  </div>
+    <!-- Catégories -->
+    <div class="flex justify-center gap-4 mt-3">
+      <button onclick="filterCategory('all')" class="px-5 py-1 rounded-full bg-white text-gray-800 shadow hover:scale-105 transition text-sm">🌍 Tous</button>
+      <button onclick="filterCategory('Coiffes')" class="px-5 py-1 rounded-full bg-white text-blue-600 shadow hover:scale-105 transition text-sm">🎀 Coiffes</button>
+      <button onclick="filterCategory('Pagnes')" class="px-5 py-1 rounded-full bg-white text-green-600 shadow hover:scale-105 transition text-sm">🧵 Pagnes</button>
+    </div>
+  </nav>
 
-  <!-- Catégories intégrées -->
-  <div class="flex justify-center gap-4 mt-3">
-    <button onclick="filterCategory('all')" 
-            class="px-5 py-1 rounded-full bg-white text-gray-800 shadow hover:scale-105 transition text-sm">
-      🌍 Tous
-    </button>
-    <button onclick="filterCategory('Coiffes')" 
-            class="px-5 py-1 rounded-full bg-white text-blue-600 shadow hover:scale-105 transition text-sm">
-      🎀 Coiffes
-    </button>
-    <button onclick="filterCategory('Pagnes')" 
-            class="px-5 py-1 rounded-full bg-white text-green-600 shadow hover:scale-105 transition text-sm">
-      🧵 Pagnes
-    </button>
-  </div>
-</nav>
-
-
-  <!-- Produits phares -->
+  <!-- ==================== PRODUITS ==================== -->
   <section class="container mx-auto px-6 py-12">
     <h3 class="text-3xl font-semibold text-center mb-8 text-gray-800">🌟 Nos Produits Phares</h3>
-    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
+    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
   </section>
 
-  <!-- Fond grisé -->
+  <!-- ==================== PANIER ==================== -->
   <div id="cartOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="closeCart()"></div>
-
-  <!-- Panier slide-in -->
-  <div id="cartPanel" 
-       class="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-500 z-50">
+  <div id="cartPanel" class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl transform translate-x-full cart-panel z-50 overflow-y-auto">
     <div class="p-6">
-      <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
-        🛒 Mon Panier
-      </h3>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800 flex items-center gap-2">🛒 Mon Panier</h3>
+        <button onclick="closeCart()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
       <ul id="cartItems" class="divide-y divide-gray-200 mb-4"></ul>
-      <button onclick="checkout()" 
-              class="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white py-2 rounded-lg shadow hover:scale-105 transition">
+      <button onclick="checkout()" class="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white py-3 rounded-lg shadow hover:scale-105 transition font-medium">
         Commander via WhatsApp
-      </button>
-      <button onclick="closeCart()" 
-              class="mt-4 w-full bg-red-500 text-white py-2 rounded-lg shadow hover:bg-red-600">
-        Fermer
       </button>
     </div>
   </div>
 
-  <!-- Toast notification -->
-  <div id="toast" class="fixed bottom-5 right-5 hidden bg-black text-white px-4 py-2 rounded-lg shadow-lg"></div>
+  <!-- ==================== TOAST ==================== -->
+  <div id="toast" class="fixed bottom-5 right-5 hidden bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg z-50"></div>
 
-  <!-- Modal produit -->
-  <div id="productModal" 
-       class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 
-              transition-opacity duration-300 opacity-0"
-       onclick="closeModal(event)">
-    <div class="bg-white rounded-xl shadow-xl w-96 relative transform transition-transform duration-300 scale-95"
-         onclick="event.stopPropagation()">
-      
-      <!-- Bouton croix -->
-      <button onclick="closeModal()" 
-              class="absolute top-2 right-2 
-                     w-10 h-10 flex items-center justify-center
-                     rounded-full border border-gray-400 
-                     text-gray-700 hover:text-black hover:border-black 
-                     bg-white shadow-lg z-50">
-        ✖
-      </button>
-      
-      <!-- Carrousel -->
+  <!-- ==================== MODAL PRODUIT ==================== -->
+  <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 transition-opacity duration-300 opacity-0" onclick="closeModal(event)">
+    <div class="bg-white rounded-xl shadow-xl w-11/12 sm:w-96 relative transform transition-transform duration-300 scale-95" onclick="event.stopPropagation()">
+      <button onclick="closeModal()" class="absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full border border-gray-400 text-gray-700 hover:text-black hover:border-black bg-white shadow-lg z-50">✖</button>
       <div id="carousel" class="relative">
         <img id="carouselImage" src="" alt="Produit" class="w-full h-64 object-cover rounded-t-xl">
-        <div class="flex justify-between absolute top-1/2 w-full px-2">
-          <button onclick="prevImage()" class="bg-gray-700 text-white px-2 py-1 rounded-full shadow">◀</button>
-          <button onclick="nextImage()" class="bg-gray-700 text-white px-2 py-1 rounded-full shadow">▶</button>
+        <div class="flex justify-between absolute top-1/2 w-full px-2 transform -translate-y-1/2">
+          <button onclick="prevImage()" class="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:bg-gray-700">◀</button>
+          <button onclick="nextImage()" class="bg-gray-800 text-white px-3 py-1 rounded-full shadow hover:bg-gray-700">▶</button>
         </div>
       </div>
-
-      <!-- Infos produit -->
       <div class="p-6">
         <h3 id="modalName" class="text-lg font-bold text-gray-800"></h3>
-        <p id="modalPrice" class="text-gray-600"></p>
-        <input type="number" id="modalQty" value="1" min="1" class="border rounded w-16 text-center mt-2">
-        <button onclick="addModalToCart()" class="mt-4 w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-2 rounded-lg shadow hover:scale-105 transition">
+        <p id="modalPrice" class="text-gray-600 mb-3"></p>
+        <input type="number" id="modalQty" value="1" min="1" class="border rounded w-20 text-center p-1 mb-4">
+        <button onclick="addModalToCart()" class="w-full bg-gradient-to-r from-blue-600 to-green-500 text-white py-2 rounded-lg shadow hover:scale-105 transition">
           Ajouter au panier
         </button>
       </div>
     </div>
   </div>
 
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="text-center py-6 text-gray-500 border-t">
+    © 2026 MT Fashion — by enock_tmz. Tous droits réservés.
+  </footer>
+
+  <!-- ==================== SCRIPT PRINCIPAL ==================== -->
   <script>
+    // ---------- PRODUITS (prix en nombres) ----------
     const products = [
-      {name: "Coiffes", price: "5,000", images: ["images/Coiffes.jpg"], category: "Coiffes", disponible: true},
-      {name: "Pagnes", price: "20,000", images: ["images/Pagnes.jpg"], category: "Pagnes", disponible: true},
-      {name: "fleur bande", price: "3,000", images: ["images/coiffe fleur1.jpg","images/coiffe fleur2.jpg"], category: "Coiffes", disponible: true},
-      {name: "fleur bande perlé", price: "5,000", images: ["images/coiffe bande1.jpg","images/coiffe bande2.jpg","images/coiffe bande3.jpg"], category: "Coiffes", disponible: true},
-      {name: "Coiffes borné", price: "3,500", images: ["images/borné1.jpg","images/borné2.jpg"], category: "Coiffes", disponible: true},
-      {name: "Model par préférence", price: "par commande, avec votre pagne", images: ["images/model1.jpg","images/model2.jpg","images/model3.jpg","images/model4.jpg","images/model5.jpg","images/model6.jpg","images/model7.jpg"], category: "Coiffes", disponible: true},
-      {name: "Coiffes fermé", price: "4,000", images: ["images/coiffe21.jpg","images/coiffe22.jpg","images/coiffe23.jpg"], category: "Coiffes", disponible: true},
-      {name: "Pagnes", price: "20,000", images: ["images/pagne1.jpg"], category: "Pagnes", disponible: true},
-      {name: "Stylé sur côté", price: "3,000", images: ["images/stylé1.jpg"], category: "Coiffes", disponible: true},
-      {name: "Pagnes", price: "20,000", images: ["images/pagne2.jpg"], category: "Pagnes", disponible: true},
-      {name: "Petit châpeau Akan", price: "1,500", images: ["images/borné21.jpg","images/borné22.jpg","images/borné23.jpg","images/borné24.jpg"], category: "Coiffes", disponible: true},
-      {name: "Pagnes", price: "20,000", images: ["images/pagne3.jpg"], category: "Pagnes", disponible: true},
-      {name: "Pagnes", price: "20,000", images: ["images/pagne4.jpg"], category: "Pagnes", disponible: true},
-      {name: "Coiffes", price: "5,000", images: ["images/coiffe perlé1.jpg","images/coiffe perlé2.jpg"], category: "Coiffes", disponible: true},
+      { name: "Coiffes", price: 5000, images: ["images/Coiffes.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne1.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne2.jpg"], category: "Pagnes", disponible: true },
+      { name: "fleur bande", price: 3000, images: ["images/coiffe fleur1.jpg", "images/coiffe fleur2.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne3.jpg"], category: "Pagnes", disponible: true },
+      { name: "fleur bande perlé", price: 5000, images: ["images/coiffe bande1.jpg", "images/coiffe bande2.jpg", "images/coiffe bande3.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne4.jpg"], category: "Pagnes", disponible: true },
+      { name: "Coiffes borné", price: 3500, images: ["images/borné1.jpg", "images/borné2.jpg"], category: "Coiffes", disponible: true },
+      { name: "Model par préférence", price: 0, images: ["images/model1.jpg", "images/model2.jpg", "images/model3.jpg", "images/model4.jpg", "images/model5.jpg", "images/model6.jpg", "images/model7.jpg"], category: "Coiffes", disponible: true, customPrice: true },
+      { name: "Coiffes fermé", price: 4000, images: ["images/coiffe21.jpg", "images/coiffe22.jpg", "images/coiffe23.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne5.jpg"], category: "Pagnes", disponible: true },
+      { name: "Stylé sur côté", price: 3000, images: ["images/stylé1.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne6.jpg"], category: "Pagnes", disponible: true },
+      { name: "Petit châpeau Akan", price: 1500, images: ["images/borné21.jpg", "images/borné22.jpg", "images/borné23.jpg", "images/borné24.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne7.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne8.jpg"], category: "Pagnes", disponible: true },
+      { name: "Coiffes", price: 5000, images: ["images/coiffe perlé1.jpg", "images/coiffe perlé2.jpg"], category: "Coiffes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne9.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne10.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne11.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne12.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne13.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne14.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne15.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne16.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne17.jpg"], category: "Pagnes", disponible: true },
+      { name: "Pagnes", price: 20000, images: ["images/pagne18.jpg"], category: "Pagnes", disponible: true }
     ];
 
+    // ---------- ÉTAT GLOBAL ----------
     let cart = [];
     let currentProduct = null;
     let currentImageIndex = 0;
 
+    // ---------- AFFICHAGE PRODUITS ----------
     function displayProducts(filter = "all") {
       const grid = document.getElementById("productGrid");
       grid.innerHTML = "";
-      products.filter(p => filter === "all" || p.category === filter).forEach((p, i) => {
+
+      const filtered = filter === "all" ? products : products.filter(p => p.category === filter);
+
+      filtered.forEach((p, index) => {
+        const priceDisplay = p.customPrice ? "Prix sur commande" : `${p.price.toLocaleString()} CFA`;
         grid.innerHTML += `
-          <div class="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition hover:scale-105"
-               onclick="openModal(${i})">
-            <img src="${p.images[0]}" alt="${p.name}" class="w-full h-48 object-cover">
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer transform transition hover:scale-105 hover:shadow-xl"
+               onclick="openModal(${products.indexOf(p)})">
+            <img src="${p.images[0]}" alt="${p.name}" class="w-full h-48 object-cover" onerror="this.src='https://via.placeholder.com/300?text=Image+non+disponible'">
             <div class="p-4">
               <h3 class="text-lg font-bold text-gray-800">${p.name}</h3>
-              <p class="text-gray-600">Prix: ${p.price} CFA</p>
-              <span class="inline-block ${p.disponible ? 'bg-green-500' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded">
+              <p class="text-gray-600">${priceDisplay}</p>
+              <span class="inline-block ${p.disponible ? 'bg-green-500' : 'bg-red-500'} text-white text-xs px-2 py-1 rounded mt-2">
                 ${p.disponible ? 'Disponible' : 'Indisponible'}
               </span>
             </div>
@@ -171,18 +144,21 @@
         `;
       });
     }
-    displayProducts();
 
+    // ---------- FILTRES ----------
     function filterCategory(cat) {
       displayProducts(cat);
     }
 
+    // ---------- MODALE ----------
     function openModal(index) {
       currentProduct = products[index];
       currentImageIndex = 0;
-      document.getElementById("carouselImage").src = currentProduct.images[currentImageIndex];
+      document.getElementById("carouselImage").src = currentProduct.images[0];
       document.getElementById("modalName").textContent = currentProduct.name;
-      document.getElementById("modalPrice").textContent = "Prix: " + currentProduct.price + " CFA";
+      
+      const priceDisplay = currentProduct.customPrice ? "Prix à discuter" : `Prix: ${currentProduct.price.toLocaleString()} CFA`;
+      document.getElementById("modalPrice").textContent = priceDisplay;
 
       const modal = document.getElementById("productModal");
       modal.classList.remove("hidden");
@@ -211,9 +187,8 @@
       document.getElementById("carouselImage").src = currentProduct.images[currentImageIndex];
     }
 
-
-
-  function openCart() {
+    // ---------- PANIER ----------
+    function openCart() {
       document.getElementById("cartPanel").classList.remove("translate-x-full");
       document.getElementById("cartPanel").classList.add("translate-x-0");
       document.getElementById("cartOverlay").classList.remove("hidden");
@@ -225,100 +200,155 @@
       document.getElementById("cartOverlay").classList.add("hidden");
     }
 
-    // Compteur panier
     function updateCartCount() {
-      const badge = document.getElementById("cartCount");
-      badge.textContent = cart.length;
-      // Animation rebond
-      badge.classList.add("animate-bounce");
-      setTimeout(() => badge.classList.remove("animate-bounce"), 500);
+      document.getElementById("cartCount").textContent = cart.length;
     }
 
-    // Ajouter depuis modal
     function addModalToCart() {
-      let qty = parseInt(document.getElementById("modalQty").value);
-      cart.push({name: currentProduct.name, price: currentProduct.price, qty});
+      if (!currentProduct.disponible) {
+        showToast("❌ Produit indisponible");
+        return;
+      }
+
+      const qty = parseInt(document.getElementById("modalQty").value);
+      
+      if (currentProduct.customPrice) {
+        // Produit spécial : on ajoute avec un prix à 0 mais on le note
+        cart.push({
+          name: currentProduct.name,
+          price: 0,
+          qty: qty,
+          customPrice: true
+        });
+        showToast("✅ Produit ajouté (prix à confirmer)");
+      } else {
+        cart.push({
+          name: currentProduct.name,
+          price: currentProduct.price,
+          qty: qty
+        });
+        showToast(`✅ ${currentProduct.name} ajouté`);
+      }
+
       closeModal();
-      displayCart();
       updateCartCount();
-      showToast(`${currentProduct.name} ajouté au panier ✅`);
+      displayCart();
       openCart();
     }
 
-    // Affichage panier
+    // ---------- AFFICHAGE PANIER (AVEC BOUTON RETIRER) ----------
     function displayCart() {
       const cartList = document.getElementById("cartItems");
       cartList.innerHTML = "";
+      
+      if (cart.length === 0) {
+        cartList.innerHTML = `
+          <li class="text-center text-gray-500 py-12">
+            🛒 Votre panier est vide<br>
+            <span class="text-sm">Découvrez nos produits !</span>
+          </li>
+        `;
+        return;
+      }
+
       let total = 0;
 
       cart.forEach((item, index) => {
-        total += item.price * item.qty;
+        let itemTotal = 0;
+        let priceDisplay = "";
+
+        if (item.customPrice) {
+          priceDisplay = "Prix à discuter";
+          itemTotal = 0;
+        } else {
+          itemTotal = item.price * item.qty;
+          total += itemTotal;
+          priceDisplay = `${itemTotal.toLocaleString()} CFA`;
+        }
+
         cartList.innerHTML += `
-          <li class="flex justify-between items-center py-3 px-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-            <span class="text-gray-700">
-              ${item.name} x${item.qty} - 
-              <span class="text-blue-600 font-semibold">${item.price * item.qty} CFA</span>
-            </span>
-            <button onclick="removeFromCart(${index})" 
-                    class="bg-gradient-to-r from-red-500 to-red-700 text-white px-3 py-1 rounded-lg shadow hover:scale-105 transition">
-              Retirer
-            </button>
+          <li class="flex flex-col sm:flex-row sm:items-center justify-between py-4 border-b gap-3">
+            <div>
+              <span class="font-medium text-gray-800">${item.name}</span>
+              <span class="text-sm text-gray-600 block">
+                ${item.qty} x ${item.customPrice ? 'sur commande' : item.price.toLocaleString() + ' CFA'}
+              </span>
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-4">
+              <span class="font-bold text-blue-600 ${item.customPrice ? 'text-amber-600' : ''}">
+                ${item.customPrice ? '💰 Sur mesure' : priceDisplay}
+              </span>
+              <button onclick="removeFromCart(${index})" 
+                      class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition shadow">
+                Retirer
+              </button>
+            </div>
           </li>
         `;
       });
 
-      cartList.innerHTML += `
-        <li class="flex justify-between items-center py-3 px-2 font-bold text-lg">
-          <span>Total</span>
-          <span class="text-green-600">${total} CFA</span>
-        </li>
-      `;
+      if (!cart.some(item => item.customPrice)) {
+        cartList.innerHTML += `
+          <li class="flex justify-between items-center py-4 mt-2 font-bold text-lg border-t-2 border-gray-300">
+            <span>Total</span>
+            <span class="text-green-600 bg-green-50 px-4 py-2 rounded-lg">${total.toLocaleString()} CFA</span>
+          </li>
+        `;
+      } else {
+        cartList.innerHTML += `
+          <li class="text-center text-amber-600 bg-amber-50 p-3 rounded-lg mt-4 text-sm">
+            💡 Le total sera confirmé lors de la commande
+          </li>
+        `;
+      }
     }
 
-    // Retirer du panier
     function removeFromCart(index) {
       cart.splice(index, 1);
       displayCart();
       updateCartCount();
-      showToast("Article retiré du panier ❌");
+      showToast("🗑️ Article retiré");
     }
 
-    // Checkout WhatsApp
+    // ---------- COMMANDE WHATSAPP ----------
     function checkout() {
-      if(cart.length === 0) {
-        alert("Votre panier est vide !");
+      if (cart.length === 0) {
+        showToast("🛒 Panier vide");
         return;
       }
-      let message = "Bonjour, je voudrais commander:\n";
-      let total = 0;
-      cart.forEach(item => {
-        total += item.price * item.qty;
-        message += `- ${item.name} x${item.qty} (${item.price * item.qty} CFA)\n`;
-      });
-      message += `Total: ${total} CFA`;
 
-      let phoneNumber = "2250504428338"; // Ton numéro WhatsApp Business
-      let url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-      window.open(url, "_blank");
+      let message = "🛍️ *Nouvelle commande MT Fashion*%0A%0A";
+      let total = 0;
+
+      cart.forEach(item => {
+        if (item.customPrice) {
+          message += `• ${item.name} x${item.qty} (prix à discuter)%0A`;
+        } else {
+          const itemTotal = item.price * item.qty;
+          total += itemTotal;
+          message += `• ${item.name} x${item.qty} = ${itemTotal.toLocaleString()} CFA%0A`;
+        }
+      });
+
+      message += `%0A📦 *Total* : ${total > 0 ? total.toLocaleString() + ' CFA' : 'À discuter'}`;
+
+      const phone = "2250504428338";
+      window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
     }
 
-    // Toast notification
+    // ---------- TOAST ----------
     function showToast(msg) {
       const toast = document.getElementById("toast");
       toast.textContent = msg;
       toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 2000);
+      setTimeout(() => toast.classList.add("hidden"), 2500);
     }
 
-    // Initialiser compteur
+    // ---------- INITIALISATION ----------
+    displayProducts();
     updateCartCount();
-
+    displayCart(); // Pour afficher "panier vide" par défaut
   </script>
-
-  <footer>
-    © 2026 — Marque T. Tous droits réservés.
-        by enock_tmz
-  </footer>
 </body>
 </html>
 
